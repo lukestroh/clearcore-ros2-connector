@@ -6,12 +6,12 @@ from std_msgs.msg import Float32
 import socket
 import json
 
-SERVER_HOST = "169.254.253.179"
+SERVER_HOST = "0.0.0.0"
 SERVER_PORT = 8888
 
-class UDPPosPublisher(Node):
+class UDPVelPublisher(Node):
     def __init__(self) -> None:
-        super().__init__(node_name='udp_pos_publisher')
+        super().__init__(node_name='udp_vel_publisher')
         self.pub: rclpy.publisher.Publisher = self.create_publisher(
             msg_type=Float32,
             topic='linear_slider_pos',
@@ -32,10 +32,7 @@ class UDPPosPublisher(Node):
     def timer_callback(self):
         msg = Float32()
         try:
-            print("hello world")
             raw_data, addr = self.pub_socket.recvfrom(1024)
-            print(raw_data)
-            # raw_data = self.socketstreamer.readline().decode().rstrip()
             json_data: dict = json.loads(raw_data)
             msg.data = float(json_data["servo_velocity"])
 
@@ -50,7 +47,7 @@ class UDPPosPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    udp_publisher = UDPPosPublisher()
+    udp_publisher = UDPVelPublisher()
 
     rclpy.spin(udp_publisher)
 

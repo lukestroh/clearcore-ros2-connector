@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            f'pos_pub = {package_name}.udp_pos_publisher:main',
+            f'vel_pub = {package_name}.udp_vel_publisher:main',
             f'target_pub = {package_name}.udp_target_publisher:main'
         ],
     },
