@@ -14,7 +14,7 @@ class UDPVelPublisher(Node):
         super().__init__(node_name='udp_vel_publisher')
         self.pub: rclpy.publisher.Publisher = self.create_publisher(
             msg_type=Float32,
-            topic='linear_slider_pos',
+            topic='linear_slider_vel',
             qos_profile=10
         )
 
