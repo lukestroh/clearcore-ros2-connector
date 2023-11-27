@@ -35,7 +35,7 @@ class UDPVelPublisher(Node):
             raw_data, addr = self.pub_socket.recvfrom(1024)
             json_data: dict = json.loads(raw_data)
             msg.data = float(json_data["servo_velocity"])
-
+            self.pub.publish(msg)
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
 
