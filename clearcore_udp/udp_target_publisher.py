@@ -18,7 +18,7 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.05
+        timer_period = 0.05 
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
@@ -34,9 +34,9 @@ class UDPTargetPublisher(Node):
         msg = Float32()
 
         
-        if self.target == 1000.0:
+        if self.target == 30.0:
             self.going_up = False
-        elif self.target == -1000.0:
+        elif self.target == -30.0:
             self.going_up = True
 
         if self.going_up:

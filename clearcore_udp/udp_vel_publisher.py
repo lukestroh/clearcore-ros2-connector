@@ -34,12 +34,13 @@ class UDPVelPublisher(Node):
         try:
             raw_data, addr = self.pub_socket.recvfrom(1024)
             json_data: dict = json.loads(raw_data)
-            msg.data = float(json_data["servo_velocity"])
+            status = json_data["status"]
+            msg.data = float(json_data["servo_vel"])
             self.pub.publish(msg)
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
 
-        self.get_logger().info(f"Linear slider current velocity: {msg.data}")
+        self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
         return
     
 
