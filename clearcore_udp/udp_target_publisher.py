@@ -18,7 +18,7 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.05
+        timer_period = 0.05 
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
@@ -34,9 +34,9 @@ class UDPTargetPublisher(Node):
         msg = Float32()
 
         
-        if self.target == 1000.0:
+        if self.target == 30.0:
             self.going_up = False
-        elif self.target == -1000.0:
+        elif self.target == -30.0:
             self.going_up = True
 
         if self.going_up:
@@ -49,9 +49,11 @@ class UDPTargetPublisher(Node):
 
         # log the info
         self.get_logger().info(f"Linear slider stepper target velocity: {msg.data}")
+
+        status = 0
         
         # send data to ClearCore
-        self.pub_socket.sendto(f"{msg.data}".encode(), self.clearcore_addr)
+        self.pub_socket.sendto(f"{status},{msg.data}".encode(), self.clearcore_addr)
         return
     
 
