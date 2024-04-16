@@ -18,7 +18,7 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.05 
+        timer_period = 0.25
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
