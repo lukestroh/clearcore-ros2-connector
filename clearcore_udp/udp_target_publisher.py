@@ -5,7 +5,10 @@ from std_msgs.msg import Float32
 
 import socket
 
-CLEARCORE_HOST = '169.254.97.177'
+
+LOCAL_IP = "169.254.57.209"
+LOCAL_PORT = 8888
+CLEARCORE_IP = '169.254.97.177'
 CLEARCORE_PORT = 8888
 
 
@@ -23,7 +26,8 @@ class UDPTargetPublisher(Node):
 
         # Socket client
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.clearcore_addr = (CLEARCORE_HOST, CLEARCORE_PORT)
+        self.pub_socket.bind((LOCAL_IP, LOCAL_PORT))
+        self.clearcore_addr = (CLEARCORE_IP, CLEARCORE_PORT)
 
         self.target = 0.0
         self.going_up: bool = True
@@ -47,11 +51,13 @@ class UDPTargetPublisher(Node):
         msg.data = self.target
         self.pub.publish(msg)
 
+        status = 0
+
         # log the info
-        self.get_logger().info(f"Linear slider stepper target velocity: {msg.data}")
+        self.get_logger().info(f"Linear slider target rpm: {msg.data}")
         
         # send data to ClearCore
-        self.pub_socket.sendto(f"{msg.data}".encode(), self.clearcore_addr)
+        self.pub_socket.sendto(f"{status},{msg.data}".encode(), self.clearcore_addr)
         return
     
 

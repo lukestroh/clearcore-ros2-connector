@@ -6,7 +6,7 @@ from std_msgs.msg import Float32
 import socket
 import json
 
-SERVER_HOST = "0.0.0.0"
+SERVER_IP = "0.0.0.0"
 SERVER_PORT = 8888
 
 class UDPVelPublisher(Node):
@@ -24,10 +24,9 @@ class UDPVelPublisher(Node):
 
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
-        self.pub_socket.bind((SERVER_HOST, SERVER_PORT))
-
+        self.pub_socket.bind((SERVER_IP, SERVER_PORT))
+        self.pub_socket.settimeout(0.0)
         return
-    
 
     def timer_callback(self):
         msg = Float32()
@@ -39,12 +38,12 @@ class UDPVelPublisher(Node):
             self.pub.publish(msg)
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
+        except BlockingIOError:
+            pass
 
         self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
         return
     
-
-
 def main(args=None):
     rclpy.init(args=args)
 
