@@ -2,12 +2,19 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
-
+from enum import Enum
 import socket
 
 CLEARCORE_HOST = '169.254.97.177'
 CLEARCORE_PORT = 8888
 
+class SystemStatus(Enum):
+    SYSTEM_OK = 0
+    SYSTEM_STANDBY = 1
+    SYSTEM_CALIBRATING = 2
+    E_STOP = 3
+    NEG_LIM = 4
+    POS_LIM = 5
 
 class UDPTargetPublisher(Node):
     def __init__(self) -> None:
@@ -18,13 +25,14 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.05 
+        timer_period = 0.01 
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.clearcore_addr = (CLEARCORE_HOST, CLEARCORE_PORT)
 
+        self.system_status = SystemStatus.SYSTEM_OK
         self.target = 0.0
         self.going_up: bool = True
         return
@@ -32,7 +40,6 @@ class UDPTargetPublisher(Node):
     def timer_callback(self):
         # Construct ROS msg, publish
         msg = Float32()
-
         
         if self.target == 30.0:
             self.going_up = False
@@ -48,10 +55,12 @@ class UDPTargetPublisher(Node):
         self.pub.publish(msg)
 
         # log the info
-        self.get_logger().info(f"Linear slider stepper target velocity: {msg.data}")
+        # self.get_logger().info(f"System status: {self.system_status.value}")
+        # self.get_logger().info(f"Linear slider stepper target velocity: {msg.data}")
+        self.get_logger().info(f"sent message: {self.system_status.value},{msg.data}".encode())
         
         # send data to ClearCore
-        self.pub_socket.sendto(f"{msg.data}".encode(), self.clearcore_addr)
+        self.pub_socket.sendto(f"{self.system_status.value},{msg.data}".encode(), self.clearcore_addr)
         return
     
 

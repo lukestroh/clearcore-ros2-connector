@@ -7,7 +7,7 @@ import socket
 import json
 
 SERVER_HOST = "0.0.0.0"
-SERVER_PORT = 8888
+SERVER_PORT = 8889
 
 class UDPVelPublisher(Node):
     def __init__(self) -> None:
@@ -19,28 +19,34 @@ class UDPVelPublisher(Node):
         )
 
         # Timer
-        timer_period=0.000001
+        timer_period=0.001
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
         self.pub_socket.bind((SERVER_HOST, SERVER_PORT))
-
+        self.get_logger().info(f"{self.pub_socket}")
         return
     
 
     def timer_callback(self):
         msg = Float32()
+        # raw_data, addr = self.pub_socket.recvfrom(1024)
+        # self.get_logger().warn(f"raw_data: {raw_data}")
         try:
             raw_data, addr = self.pub_socket.recvfrom(1024)
+            self.get_logger().warn(f"{raw_data}")
             json_data: dict = json.loads(raw_data)
             status = json_data["status"]
-            msg.data = float(json_data["servo_vel"])
+            msg.data = float(json_data["servo_rpm"])
             self.pub.publish(msg)
+
+            self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
+
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
 
-        self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
+        
         return
     
 
