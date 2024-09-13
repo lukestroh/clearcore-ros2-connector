@@ -27,7 +27,7 @@ class UDPVelPublisher(Node):
         self.pub_socket.bind((SERVER_IP, SERVER_PORT))
         self.pub_socket.settimeout(0.0)
         
-        self.get_logger().warn(f"Socket: {self.pub_socket}")
+        self.get_logger().info(f"Socket: {self.pub_socket}")
         return
 
     def timer_callback(self):
