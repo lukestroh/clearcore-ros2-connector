@@ -5,6 +5,7 @@ from std_msgs.msg import Float32
 
 import socket
 
+
 CLEARCORE_IP = '169.254.57.177'
 CLEARCORE_PORT = 8888
 LOCAL_IP = "169.254.57.209"
@@ -20,12 +21,13 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.05
+        timer_period = 0.05 
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.pub_socket.bind((LOCAL_IP, LOCAL_PORT))
+
         self.clearcore_addr = (CLEARCORE_IP, CLEARCORE_PORT)
 
         self.target = 0.0
@@ -56,6 +58,7 @@ class UDPTargetPublisher(Node):
         self.pub_socket.sendto(f"{status},{msg.data}".encode(), self.clearcore_addr)
         # log the info
         self.get_logger().info(f"Sent: {msg.data}")
+
         return
     
 
