@@ -24,9 +24,10 @@ class UDPVelPublisher(Node):
 
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
-
         self.pub_socket.bind((SERVER_IP, SERVER_PORT))
         self.pub_socket.settimeout(0.0)
+        
+        self.get_logger().warn(f"Socket: {self.pub_socket}")
         return
 
     def timer_callback(self):
