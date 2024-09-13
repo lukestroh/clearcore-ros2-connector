@@ -7,7 +7,7 @@ import socket
 import json
 
 SERVER_IP = "0.0.0.0"
-SERVER_PORT = 8888
+SERVER_PORT = 44644
 
 class UDPVelPublisher(Node):
     def __init__(self) -> None:
@@ -38,7 +38,7 @@ class UDPVelPublisher(Node):
             json_data: dict = json.loads(raw_data)
 
             status = json_data["status"]
-            msg.data = float(json_data["servo_vel"])
+            msg.data = float(json_data["servo_rpm"])
             self.pub.publish(msg)
             # self.get_logger().info(f"Status: {status}, Velocity: {msg.data}")
 
