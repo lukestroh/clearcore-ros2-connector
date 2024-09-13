@@ -6,8 +6,8 @@ from std_msgs.msg import Float32
 import socket
 import json
 
-SERVER_HOST = "0.0.0.0"
-SERVER_PORT = 44644
+SERVER_IP = "0.0.0.0"
+SERVER_PORT = 8888
 
 class UDPVelPublisher(Node):
     def __init__(self) -> None:
@@ -24,12 +24,10 @@ class UDPVelPublisher(Node):
 
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
-        self.pub_socket.bind((SERVER_HOST, SERVER_PORT))
-        self.pub_socket.setblocking(0)
 
-        self.get_logger().warn(f"{self.pub_socket}")
+        self.pub_socket.bind((SERVER_IP, SERVER_PORT))
+        self.pub_socket.settimeout(0.0)
         return
-    
 
     def timer_callback(self):
         msg = Float32()
@@ -37,10 +35,9 @@ class UDPVelPublisher(Node):
             raw_data, addr = self.pub_socket.recvfrom(1024)
             self.get_logger().warn(f"{raw_data}")
             json_data: dict = json.loads(raw_data)
-            
 
             status = json_data["status"]
-            msg.data = float(json_data["servo_rpm"])
+            msg.data = float(json_data["servo_vel"])
             self.pub.publish(msg)
             # self.get_logger().info(f"Status: {status}, Velocity: {msg.data}")
 
@@ -60,10 +57,9 @@ class UDPVelPublisher(Node):
             self.get_logger().error(f"Unexpected error: {e}")
 
         
+
         return
     
-
-
 def main(args=None):
     rclpy.init(args=args)
 
