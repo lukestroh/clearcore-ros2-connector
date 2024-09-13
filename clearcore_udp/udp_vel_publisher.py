@@ -24,6 +24,7 @@ class UDPVelPublisher(Node):
 
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
+
         self.pub_socket.bind((SERVER_IP, SERVER_PORT))
         self.pub_socket.settimeout(0.0)
         return
@@ -32,16 +33,31 @@ class UDPVelPublisher(Node):
         msg = Float32()
         try:
             raw_data, addr = self.pub_socket.recvfrom(1024)
+            self.get_logger().warn(f"{raw_data}")
             json_data: dict = json.loads(raw_data)
+
             status = json_data["status"]
             msg.data = float(json_data["servo_vel"])
             self.pub.publish(msg)
+            # self.get_logger().info(f"Status: {status}, Velocity: {msg.data}")
+
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f"JSON decode error: {e}")
+        except BlockingIOError as e:
+            self.get_logger().debug("No data received")
+        except KeyboardInterrupt:
+            return
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
-        except BlockingIOError:
-            pass
+            status = -1
+            msg.data = 0.0
+        except KeyError as e:
+            print(f"KeyError: {e}")
+        except Exception as e:
+            self.get_logger().error(f"Unexpected error: {e}")
 
-        self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
+        
+
         return
     
 def main(args=None):

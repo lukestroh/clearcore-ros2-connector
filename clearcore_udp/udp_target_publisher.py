@@ -6,10 +6,10 @@ from std_msgs.msg import Float32
 import socket
 
 
-LOCAL_IP = "169.254.57.209"
-LOCAL_PORT = 8888
-CLEARCORE_IP = '169.254.97.177'
+CLEARCORE_IP = '169.254.57.177'
 CLEARCORE_PORT = 8888
+LOCAL_IP = "169.254.57.209"
+LOCAL_PORT = 44644
 
 
 class UDPTargetPublisher(Node):
@@ -26,7 +26,8 @@ class UDPTargetPublisher(Node):
 
         # Socket client
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.pub_socket.bind((LOCAL_IP, LOCAL_PORT))
+        # self.pub_socket.bind((LOCAL_IP, LOCAL_PORT))
+
         self.clearcore_addr = (CLEARCORE_IP, CLEARCORE_PORT)
 
         self.target = 0.0
@@ -52,12 +53,12 @@ class UDPTargetPublisher(Node):
         self.pub.publish(msg)
 
         status = 0
-
-        # log the info
-        self.get_logger().info(f"Linear slider target rpm: {msg.data}")
         
-        # send data to ClearCore
+        # send data to ClearCoreCLEARCORE_HOST
         self.pub_socket.sendto(f"{status},{msg.data}".encode(), self.clearcore_addr)
+        # log the info
+        self.get_logger().info(f"Sent: {msg.data}")
+
         return
     
 
