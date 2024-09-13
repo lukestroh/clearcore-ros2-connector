@@ -27,7 +27,7 @@ class UDPVelPublisher(Node):
         self.pub_socket.bind((SERVER_HOST, SERVER_PORT))
         self.pub_socket.setblocking(0)
 
-        self.get_logger().warn(f"{self.pub_socket}")
+        self.get_logger().warn(f"Socket: {self.pub_socket}")
         return
     
 
