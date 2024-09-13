@@ -5,8 +5,10 @@ from std_msgs.msg import Float32
 
 import socket
 
-CLEARCORE_HOST = '169.254.97.177'
+CLEARCORE_IP = '169.254.57.177'
 CLEARCORE_PORT = 8888
+LOCAL_IP = "169.254.57.209"
+LOCAL_PORT = 44644
 
 
 class UDPTargetPublisher(Node):
@@ -18,12 +20,13 @@ class UDPTargetPublisher(Node):
             qos_profile=10 # qos_profile or history depth
         )
         # Timer
-        timer_period = 0.25
+        timer_period = 0.05
         self.timer: rclpy.timer.Rate = self.create_timer(timer_period_sec=timer_period, callback=self.timer_callback)
 
         # Socket client
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.clearcore_addr = (CLEARCORE_HOST, CLEARCORE_PORT)
+        # self.pub_socket.bind((LOCAL_IP, LOCAL_PORT))
+        self.clearcore_addr = (CLEARCORE_IP, CLEARCORE_PORT)
 
         self.target = 0.0
         self.going_up: bool = True
@@ -47,13 +50,12 @@ class UDPTargetPublisher(Node):
         msg.data = self.target
         self.pub.publish(msg)
 
-        # log the info
-        self.get_logger().info(f"Linear slider stepper target velocity: {msg.data}")
-
         status = 0
         
-        # send data to ClearCore
+        # send data to ClearCoreCLEARCORE_HOST
         self.pub_socket.sendto(f"{status},{msg.data}".encode(), self.clearcore_addr)
+        # log the info
+        self.get_logger().info(f"Sent: {msg.data}")
         return
     
 

@@ -7,7 +7,7 @@ import socket
 import json
 
 SERVER_HOST = "0.0.0.0"
-SERVER_PORT = 8888
+SERVER_PORT = 44644
 
 class UDPVelPublisher(Node):
     def __init__(self) -> None:
@@ -25,7 +25,9 @@ class UDPVelPublisher(Node):
         # Socket server
         self.pub_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM for UDP
         self.pub_socket.bind((SERVER_HOST, SERVER_PORT))
+        self.pub_socket.setblocking(0)
 
+        self.get_logger().warn(f"{self.pub_socket}")
         return
     
 
@@ -40,11 +42,24 @@ class UDPVelPublisher(Node):
             status = json_data["status"]
             msg.data = float(json_data["servo_rpm"])
             self.pub.publish(msg)
+            # self.get_logger().info(f"Status: {status}, Velocity: {msg.data}")
+
+        except json.JSONDecodeError as e:
+            self.get_logger().error(f"JSON decode error: {e}")
+        except BlockingIOError as e:
+            self.get_logger().debug("No data received")
+        except KeyboardInterrupt:
+            return
         except ValueError as e:
             print(f"{e}: Could not convert msg type to float.")
             status = -1
             msg.data = 0.0
-        self.get_logger().info(f"Status: {status}\nVelocity: {msg.data}")
+        except KeyError as e:
+            print(f"KeyError: {e}")
+        except Exception as e:
+            self.get_logger().error(f"Unexpected error: {e}")
+
+        
         return
     
 
